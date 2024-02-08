@@ -10,15 +10,15 @@ BOT_USERNAME: Final = "@ikwame_bot"
 
 
 #comments
-async def start_command(Update:Update, context: ContextTypes.DEFAULT_TYPE):
+async def start_command(update:Update, context: ContextTypes.DEFAULT_TYPE):
     await Update.message.reply_text("Hello! Thanks for Chattting with me! I am ikwame's bot")
 
 
-async def help_command(Update:Update, context: ContextTypes.DEFAULT_TYPE):
+async def help_command(update:Update, context: ContextTypes.DEFAULT_TYPE):
     await Update.message.reply_text(" I am ikwame and Im ready to provide you with any lesropic divop")
 
 
-async def custom_command(Update:Update, context: ContextTypes.DEFAULT_TYPE):
+async def custom_command(update:Update, context: ContextTypes.DEFAULT_TYPE):
     await Update.message.reply_text("type your preferred command and I'm ready to execute")
 
 #_Responses
@@ -46,9 +46,39 @@ async def handle_message(update:Update, context: ContextTypes.DEFAULT_TYPE):
 
     if message_type == 'group':
         if BOT_USERNAME in text:
-            new_text : str = text.replace(BOT_USERNAME, ' ').strip()
+            new_text : str = text.replace(BOT_USERNAME, '').strip()
             response: str = handle_response(new_text)
         else:
             return
     else:
         response : str = handle_response(text)
+
+    print('Bot:', response)
+    await update.message.reply_text(response)
+
+
+async def error(update:Update, context: ContextTypes.DEFAULT_TYPE):
+    print(f'Update {update} caused error {context.error}')
+
+if __name__ == '__main__':
+    print('Starting bot.......')
+    app = Application.builder().token(TOKEN).build()
+
+
+    app.add_handler(CommandHandler('start', start_command))
+    app.add_handler(CommandHandler('help', help_command))
+    app.add_handler(CommandHandler('custom', custom_command))
+
+    #Messages
+    app.add_handler(MessageHandler(filters.TEXT, handle_message))
+
+    #H Errors
+    app.add_error_handler(error)
+
+
+    #polls the bot
+    print("Polling")
+    app.run_polling(poll_interval=3)
+
+    
+
